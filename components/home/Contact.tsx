@@ -19,11 +19,11 @@ import SectionHeading from "@/components/ui/SectionHeading";
 const GOOGLE_FORM_ACTION =
   "https://docs.google.com/forms/d/e/1FAIpQLScH-mgpefEh6aAq45AsRvAvmrrTK4kLk4kLE5MV6ARuHYiKKQ/formResponse";
 
-const GOOGLE_FORM_TARGET = "asr-law-google-form-response";
 
 const FORM_FIELDS = {
   name: "entry.2005620554",
   email: "entry.1045781291",
+  address: "entry.1065046570",
   phone: "entry.1166974658",
   query: "entry.839337160",
 } as const;
@@ -146,30 +146,60 @@ function ContactMethodLink({
 export default function Contact() {
   const shouldReduceMotion = useReducedMotion();
   const formRef = useRef<HTMLFormElement>(null);
-  const submittedRequest = useRef(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submissionError, setSubmissionError] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    if (!event.currentTarget.checkValidity()) {
+  const handleSubmit = async (
+    event: FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
       return;
     }
 
-    submittedRequest.current = true;
     setIsSubmitting(true);
     setIsSubmitted(false);
-  };
+    setSubmissionError(false);
 
-  const handleResponseLoad = () => {
-    if (!submittedRequest.current) {
-      return;
+    try {
+      const formData = new FormData(form);
+
+      // The Google Form was originally configured with an Address
+      // question. Keep that entry populated even though the website
+      // no longer asks visitors to provide an address.
+      formData.set(FORM_FIELDS.address, "Not provided");
+
+      const encodedData = new URLSearchParams();
+
+      formData.forEach((value, key) => {
+        if (typeof value === "string") {
+          encodedData.append(key, value);
+        }
+      });
+
+      await fetch(GOOGLE_FORM_ACTION, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded;charset=UTF-8",
+        },
+        body: encodedData.toString(),
+      });
+
+      form.reset();
+      setIsSubmitted(true);
+    } catch {
+      setSubmissionError(true);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    submittedRequest.current = false;
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    formRef.current?.reset();
   };
 
   const revealInitial = shouldReduceMotion
@@ -202,15 +232,6 @@ export default function Contact() {
       aria-labelledby="contact-heading"
       className="relative border-b border-[#343434] bg-[#111111] text-[#F7F6F3]"
     >
-      <iframe
-        name={GOOGLE_FORM_TARGET}
-        title="Google Form submission response"
-        aria-hidden="true"
-        tabIndex={-1}
-        onLoad={handleResponseLoad}
-        className="hidden"
-      />
-
       <Container className="pb-[clamp(5.5rem,7vw,8rem)] pt-[clamp(5.5rem,7vw,8rem)]">
         <header className="border-t border-[#343434] pt-7 sm:pt-8">
           <div className="grid grid-cols-1 gap-y-10 lg:grid-cols-12 lg:gap-x-14 xl:gap-x-16">
@@ -298,12 +319,8 @@ export default function Contact() {
 
               <form
                 ref={formRef}
-                action={GOOGLE_FORM_ACTION}
-                method="POST"
-                target={GOOGLE_FORM_TARGET}
-                acceptCharset="UTF-8"
-                aria-busy={isSubmitting}
                 onSubmit={handleSubmit}
+                aria-busy={isSubmitting}
                 className="px-6 py-8 sm:px-8 lg:px-9 xl:px-10"
               >
                 <div className="grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2">
@@ -478,7 +495,7 @@ export default function Contact() {
                     )}
                   >
                     <span>
-                      {isSubmitting ? "Submitting" : "Submit Enquiry"}
+                      {isSubmitting ? "Submitting…" : "Submit Enquiry"}
                     </span>
 
                     <Send
@@ -539,6 +556,27 @@ export default function Contact() {
                           provided.
                         </p>
                       </motion.div>
+                    )}
+                  </div>
+                </div>
+
+                <div
+                  aria-live="polite"
+                  aria-atomic="true"
+                  className={clsx(
+                    "grid transition-[grid-template-rows,opacity,margin]",
+                    "duration-500 motion-reduce:transition-none",
+                    submissionError
+                      ? "mt-7 grid-rows-[1fr] opacity-100"
+                      : "mt-0 grid-rows-[0fr] opacity-0"
+                  )}
+                >
+                  <div className="overflow-hidden">
+                    {submissionError && (
+                      <p className="border-t border-[#343434] pt-7 text-sm leading-7 text-[#D6D2C9]">
+                        The enquiry could not be sent. Please try again or use
+                        the direct email address listed alongside the form.
+                      </p>
                     )}
                   </div>
                 </div>
