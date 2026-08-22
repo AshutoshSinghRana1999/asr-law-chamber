@@ -38,9 +38,9 @@ export const metadata: Metadata = {
 const organizationStructuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "@id": "https://asrlaw.in/#organization",
+  "@id": "https://www.asrlaw.in/#organization",
   name: "ASR LAW",
-  url: "https://asrlaw.in",
+  url: "https://www.asrlaw.in",
   description:
     "Independent legal practice based in New Delhi providing legal advice and representation to businesses, financial institutions and individuals.",
   address: {

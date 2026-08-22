@@ -26,7 +26,7 @@ type InsightPageProps = {
 
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ??
-  "https://asrlaw.in"
+  "https://www.asrlaw.in"
 ).replace(/\/$/, "");
 
 function createAbsoluteUrl(value: string): string {

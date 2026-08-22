@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 import { expertiseSlugs } from "@/data/expertise";
 import { getAllInsights } from "@/lib/mdx";
 
-const SITE_URL = "https://asrlaw.in";
+const SITE_URL = "https://www.asrlaw.in";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const insights = getAllInsights();

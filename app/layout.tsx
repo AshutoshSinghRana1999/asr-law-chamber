@@ -20,7 +20,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://asrlaw.in"),
+  metadataBase: new URL("https://www.asrlaw.in"),
 
   applicationName: "ASR LAW",
 
@@ -42,6 +42,12 @@ export const metadata: Metadata = {
   publisher: "ASR LAW",
 
   category: "Legal Services",
+
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
 
   openGraph: {
     title: "ASR LAW | Advocates & Legal Consultants",

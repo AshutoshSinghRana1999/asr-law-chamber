@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://asrlaw.in/sitemap.xml",
-    host: "https://asrlaw.in",
+    sitemap: "https://www.asrlaw.in/sitemap.xml",
+    host: "https://www.asrlaw.in",
   };
 }
